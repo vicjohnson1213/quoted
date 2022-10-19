@@ -1,0 +1,22 @@
+:host {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(2px);
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background-color: black;
+    opacity: 70%;
+  }
+
+  .modal {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    margin-top: 20%;
+    padding: 16px;
+    background-color: white;
+  }
+}

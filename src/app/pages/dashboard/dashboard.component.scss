@@ -1,0 +1,77 @@
+:host {
+
+  header {
+    background-color: lightcoral;
+    padding: 16px;
+
+    input[type="text"] {
+      width: 100%;
+    }
+  }
+
+  main {
+    display: block;
+    margin-top: 16px;
+
+
+    .quote {
+      margin-top: 16px;
+      padding: 16px;
+      cursor: pointer;
+      border: 1px solid lightcoral;
+
+      .authors {
+        margin-top: 8px;
+        margin-left: 32px;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 16px;
+      }
+    }
+  }
+
+  .new-quote {
+    h2 {
+      margin: 0;
+    }
+
+    textarea {
+      width: 100%;
+      margin-top: 8px;
+      padding: 16px;
+      resize: none;
+      border: none;
+      border-left: 4px solid lightgray;
+
+      &:focus-visible {
+        outline: none;
+      }
+    }
+
+    input {
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+
+    }
+  }
+}
+
+blockquote {
+  margin-inline: 0;
+  margin-block: 0;
+  padding-left: 16px;
+  font-family: monospace;
+  white-space: pre-line;
+
+  border-left: 4px solid lightgray;
+}
