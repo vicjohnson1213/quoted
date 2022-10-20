@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LandingComponent } from './pages/landing/landing.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalComponent } from './components/modal/modal.component';
 
 @NgModule({
@@ -19,6 +20,7 @@ import { ModalComponent } from './components/modal/modal.component';
     FormsModule,
     ReactiveFormsModule,
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule
   ],
   providers: [],

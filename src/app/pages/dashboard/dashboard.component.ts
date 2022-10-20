@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 
 import { Quote } from 'src/app/model/quote.dto';
 import { QuoteService } from 'src/app/services/quote.service';
@@ -11,37 +10,75 @@ import { QuoteService } from 'src/app/services/quote.service';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
-  public quotes: Quote[] = [];
-  public newQuoteForm!: FormGroup;
+  public quoteForm!: FormGroup;
+  public searchForm!: FormGroup;
   public showEditQuoteModal = false;
 
+  private quotes: Quote[] = [];
+  public filteredQuotes: Quote[] = [];
+
+  private selectedQuote?: Quote;
+
   @ViewChildren('content') contentField?: QueryList<ElementRef>;
+  @ViewChild('search') searchField?: ElementRef;
 
   constructor(
     private fb: FormBuilder,
     private quoteSvc: QuoteService) { }
 
+
   ngOnInit(): void {
-    this.newQuoteForm = this.fb.group({
+    this.quoteForm = this.fb.group({
       content: ['', [Validators.required]],
       author: ['']
     });
 
-    this.quoteSvc.getQuotes()
-      .subscribe(quotes => this.quotes = quotes);
+    this.searchForm = this.fb.group({
+      search: ['']
+    });
+
+    this.searchForm.valueChanges
+      .subscribe(() => this.updateQuotes());
+
+    this.quoteSvc.quotes$
+      .subscribe(quotes => {
+        this.quotes = Object.values(quotes);
+        this.quotes.sort((a, b) => (a.author || 'zzz')?.localeCompare((b.author || 'zzz')));
+        this.updateQuotes();
+      });
   }
 
   ngAfterViewInit(): void {
     this.contentField?.changes.subscribe(() => {
-      console.log('focus')
       if (this.contentField?.length) {
         this.contentField.first.nativeElement.focus();
       }
     });
   }
 
+  @HostListener('document:keydown', ['$event']) onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      this.cancelEditing();
+    }
+  }
+
+  updateQuotes() {
+    this.filteredQuotes = this.quotes.filter(quote => {
+      const search = this.searchForm.value.search.toLowerCase();
+      return (
+        !search ||
+        quote.author?.toLowerCase().includes(search.toLowerCase()) ||
+        (!quote.author && 'unknown'.includes(search.toLowerCase())) ||
+        quote.content.toLowerCase().includes(search.toLowerCase())
+      );
+    });
+  }
+
   editQuote(quote?: Quote) {
-    this.newQuoteForm.patchValue({
+    this.selectedQuote = quote;
+    this.quoteForm.patchValue({
       content: quote?.content,
       author: quote?.author
     });
@@ -51,23 +88,33 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   cancelEditing() {
     this.showEditQuoteModal = false;
-    this.newQuoteForm.reset();
+    this.quoteForm.reset();
   }
 
   deleteQuote() {
-    console.log('delete quote')
+    if (!this.selectedQuote) {
+      return;
+    }
+
+    this.quoteSvc.deleteQuote(this.selectedQuote)
+      .subscribe(() => {
+        this.showEditQuoteModal = false;
+        this.updateQuotes();
+      });
   }
 
   saveQuote() {
-    if (!this.newQuoteForm.valid) {
+    if (!this.quoteForm.valid) {
       return;
     }
 
     this.quoteSvc.saveQuote({
-      content: this.newQuoteForm.value.content,
-      author: this.newQuoteForm.value.author
+      content: this.quoteForm.value.content,
+      author: this.quoteForm.value.author,
+      id: this.selectedQuote?.id
     }).subscribe(() => {
       this.showEditQuoteModal = false;
+      this.updateQuotes();
     });
   }
 }

@@ -1,15 +1,15 @@
 <header>
-  <div class="container">
-    <input type="text" placeholder="Search" />
-  </div>
+  <form class="container" [formGroup]="searchForm">
+    <input #search formControlName="search" type="text" placeholder="Search" />
+  </form>
 </header>
 
 <main class="container">
   <button class="btn" (click)="editQuote()">New quote</button>
 
-  <article class="quote" *ngFor="let quote of quotes" (click)="editQuote(quote)">
+  <article class="quote" *ngFor="let quote of filteredQuotes" (click)="editQuote(quote)">
     <blockquote>{{ quote.content }}</blockquote>
-    <div class="authors" *ngIf="quote.author">- {{ quote.author }}</div>
+    <div class="authors">- {{ quote.author || 'Unknown' }}</div>
     <div class="tags" *ngIf="quote.tags?.length">
       <span class="tag" *ngFor="let tag of quote.tags">{{ tag }}</span>
     </div>
@@ -18,7 +18,7 @@
 
 <q-modal class="new-quote" *ngIf="showEditQuoteModal">
   <h2>New quote</h2>
-  <form [formGroup]="newQuoteForm" (submit)="saveQuote()">
+  <form [formGroup]="quoteForm" (submit)="saveQuote()">
     <textarea #content formControlName="content" rows="8" placeholder="New quote"></textarea>
     <input type="text" formControlName="author" placeholder="Author" />
   </form>

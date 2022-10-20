@@ -1,8 +1,9 @@
 :host {
+  display: block;
+  width: 100%;
 
   header {
     background-color: lightcoral;
-    padding: 16px;
 
     input[type="text"] {
       width: 100%;
@@ -11,8 +12,6 @@
 
   main {
     display: block;
-    margin-top: 16px;
-
 
     .quote {
       margin-top: 16px;
