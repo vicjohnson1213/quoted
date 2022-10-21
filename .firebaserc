@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "quoted-932aa": {
+      "hosting": {
+        "quoted": [
+          "quoted-932aa"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "quoted-932aa"
+  }
+}

@@ -1,105 +1,39 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, map, Observable, of, switchMap, tap } from 'rxjs';
-import { v4 as uuid } from 'uuid';
+import { Auth, authState } from '@angular/fire/auth';
+import { child, Database, objectVal, push, ref, remove, update } from '@angular/fire/database';
+import { filter, from, map, Observable, of, switchMap } from 'rxjs';
 import { Quote } from '../model/quote.dto';
 import { IQuoteService } from './interfaces/IQuoteService.service';
-
-
-interface GistFile {
-  filename: string;
-  raw_url: string;
-  content: string;
-}
-
-interface Gist {
-  description: string;
-  id: string;
-  files: { [key: string]: GistFile };
-}
-
-interface QuotesFile {
-  settings: any;
-  quotes: { [key: string]: Quote };
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class QuoteService implements IQuoteService {
-  private _gist?: Gist;
-  private _whatever$ = new BehaviorSubject<{ [key: string]: Quote }>({});
+  constructor(
+    private auth: Auth,
+    private db: Database
+  ) { }
 
-  constructor(private http: HttpClient) { }
-
-  get quotes$(): Observable<{ [key: string]: Quote }> {
-    if (Object.keys(this._whatever$.value).length) {
-      return this._whatever$.asObservable();
-    }
-
-    return this.http.get<Gist[]>('https://api.github.com/gists', {
-      headers: {
-        Authorization: `Bearer ${GH_TOKEN}`
-      }
-    }).pipe(
-      map(gists => gists.find(gist => gist.description === 'Quoted')),
-      switchMap(gist => {
-        return !!gist ? of(gist) : this.http.post<Gist>('https://api.github.com/gists', {
-          description: 'Quoted',
-          public: false,
-          files: {
-            'quoted.json': { content: JSON.stringify({ quotes: {} }) }
-          }
-        }, {
-          headers: { Authorization: `Bearer ${GH_TOKEN}` }
-        });
-      }),
-      // filter(gist => !!gist),
-      tap(gist => this._gist = gist),
-      switchMap(gist => this.http.get<QuotesFile>(gist!.files['quoted.json'].raw_url)),
-      tap(quotesFile => this._whatever$.next(quotesFile.quotes)),
-      switchMap(() => this._whatever$.asObservable())
+  quotes$: Observable<{ [key: string]: Quote; }> =
+    authState(this.auth).pipe(
+      filter(user => !!user),
+      switchMap(user => objectVal<{ [key: string]: Quote; }>(ref(this.db, `/user-quotes/${user?.uid}`)))
     );
-  }
 
   saveQuote(quote: Quote): Observable<any> {
-    // If this quote already has an id, we're just editing one. If it's missing
-    // it's id, generate a new one.
+    console.log(quote);
     if (!quote.id) {
-      do {
-        quote.id = uuid();
-      } while (this._whatever$.value[quote.id]);
+      quote.id = push(child(ref(this.db), 'user-quotes')).key!;
     }
 
-    this._whatever$.value[quote.id] = quote;
-    return this.saveAll();
+    const updates: { [key: string]: Quote } = {};
+    updates['/user-quotes/' + this.auth.currentUser?.uid + '/' + quote.id] = quote;
+
+    console.log(updates);
+    return from(update(ref(this.db), updates));
   }
 
   deleteQuote(quote: Quote): Observable<any> {
-    delete this._whatever$.value[quote.id!];
-    return this.saveAll();
-  }
-
-  private saveAll(): Observable<any> {
-    if (!this._gist) {
-      throw new Error("what's the gist??");
-    }
-
-    return this.http.patch<Gist>(`https://api.github.com/gists/${this._gist.id}`, {
-      files: {
-        'quoted.json': {
-          content: JSON.stringify({
-            quotes: this._whatever$.value
-          })
-        }
-      }
-    }, {
-      headers: {
-        Authorization: `Bearer ${GH_TOKEN}`
-      },
-    }).pipe(
-      map(gist => JSON.parse(gist.files['quoted.json'].content)),
-      tap(quotesFile => this._whatever$.next(quotesFile.quotes))
-    );
+    return from(remove(ref(this.db, `user-quotes/${this.auth.currentUser?.uid}/${quote.id}`)));
   }
 }

@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Auth, authState } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { filter, switchMap } from 'rxjs';
 
 import { Quote } from 'src/app/model/quote.dto';
 import { QuoteService } from 'src/app/services/quote.service';
@@ -24,6 +26,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   constructor(
     private fb: FormBuilder,
+    private auth: Auth,
     private quoteSvc: QuoteService) { }
 
 
@@ -108,13 +111,19 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.quoteSvc.saveQuote({
+    const newQuote: Quote = {
       content: this.quoteForm.value.content,
-      author: this.quoteForm.value.author,
       id: this.selectedQuote?.id
-    }).subscribe(() => {
-      this.showEditQuoteModal = false;
-      this.updateQuotes();
-    });
+    };
+
+    if (this.quoteForm.value.author) {
+      newQuote.author = this.quoteForm.value.author
+    };
+
+    this.quoteSvc.saveQuote(newQuote)
+      .subscribe(() => {
+        this.showEditQuoteModal = false;
+        this.updateQuotes();
+      });
   }
 }
