@@ -1,39 +1,24 @@
-import { Component, OnInit, Optional } from '@angular/core';
-import { Auth, authState, GoogleAuthProvider, signInWithPopup, signOut, User } from '@angular/fire/auth';
+import { Component } from '@angular/core';
+import { Auth, authState, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { EMPTY, map, Observable, Subscription } from 'rxjs';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'q-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']
 })
-export class LandingComponent implements OnInit {
-  public readonly user: Observable<User | null> = EMPTY;
-
+export class LandingComponent {
   constructor(
     private router: Router,
-    @Optional() private auth: Auth
+    private auth: Auth
   ) {
-    if (auth) {
-      console.log('auth here');
-      authState(this.auth)
-        .subscribe(user => {
-          if (user) {
-            this.router.navigate(['/']);
-          }
-        });
-    }
-  }
-
-  ngOnInit(): void {
+    authState(this.auth)
+      .pipe(filter(user => !!user))
+      .subscribe(() => this.router.navigate(['/']));
   }
 
   async logIn() {
     await signInWithPopup(this.auth, new GoogleAuthProvider());
-  }
-
-  async logOut() {
-    return await signOut(this.auth);
   }
 }

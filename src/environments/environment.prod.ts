@@ -7,7 +7,8 @@ export const environment = {
     authDomain: 'quoted-932aa.firebaseapp.com',
     messagingSenderId: '419540907655',
     measurementId: 'G-HY2JL20J78',
-    databaseUrl: 'https://quoted-932aa-default-rtdb.firebaseio.com/'
+    databaseUrl: 'https://quoted-932aa-default-rtdb.firebaseio.com/',
+    reCaptchaKey: '6Ldn_pwiAAAAAI0V95zSGU5pGnsqgMpnKIhJVr7u'
   },
   production: true
 };

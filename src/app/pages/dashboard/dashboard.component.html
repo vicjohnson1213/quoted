@@ -16,7 +16,7 @@
   </article>
 </main>
 
-<q-modal class="new-quote" *ngIf="showEditQuoteModal">
+<q-modal class="new-quote" *ngIf="showEditQuoteModal" (close)="showEditQuoteModal = false">
   <h2>New quote</h2>
   <form [formGroup]="quoteForm" (submit)="saveQuote()">
     <textarea #content formControlName="content" rows="8" placeholder="New quote"></textarea>

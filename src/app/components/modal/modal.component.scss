@@ -13,10 +13,19 @@
   .modal {
     position: absolute;
     left: 50%;
+    top: 20%;
     transform: translateX(-50%);
+    width: calc(100% - 32px);
 
-    margin-top: 20%;
     padding: 16px;
     background-color: white;
+  }
+}
+
+@media only screen and (min-width: 678px) {
+  :host {
+    .modal {
+      width: calc(678px - 32px);
+    }
   }
 }
