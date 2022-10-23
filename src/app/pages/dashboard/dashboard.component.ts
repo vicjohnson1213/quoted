@@ -32,8 +32,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.quoteForm = this.fb.group({
       content: ['', [Validators.required]],
-      author: [''],
-      tags: ['']
+      author: ['']
     });
 
     this.searchForm = this.fb.group({
@@ -74,8 +73,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         !search ||
         quote.author?.toLowerCase().includes(search.toLowerCase()) ||
         (!quote.author && 'unknown'.includes(search.toLowerCase())) ||
-        quote.content.toLowerCase().includes(search.toLowerCase()) ||
-        (quote.tags?.join(' ').toLowerCase().includes(search.toLowerCase()))
+        quote.content.toLowerCase().includes(search.toLowerCase())
       );
     });
   }
@@ -84,8 +82,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.selectedQuote = quote;
     this.quoteForm.patchValue({
       content: quote?.content,
-      author: quote?.author,
-      tags: quote?.tags?.join(', ')
+      author: quote?.author
     });
 
     this.showEditQuoteModal = true;
@@ -121,10 +118,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     if (this.quoteForm.value.author) {
       newQuote.author = this.quoteForm.value.author
     };
-
-    if (this.quoteForm.value.tags) {
-      newQuote.tags = this.quoteForm.value.tags.split(/,\s+/);
-    }
 
     this.quoteSvc.saveQuote(newQuote)
       .subscribe(() => {
