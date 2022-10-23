@@ -74,7 +74,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         !search ||
         quote.author?.toLowerCase().includes(search.toLowerCase()) ||
         (!quote.author && 'unknown'.includes(search.toLowerCase())) ||
-        quote.content.toLowerCase().includes(search.toLowerCase())
+        quote.content.toLowerCase().includes(search.toLowerCase()) ||
+        (quote.tags?.join(' ').toLowerCase().includes(search.toLowerCase()))
       );
     });
   }
