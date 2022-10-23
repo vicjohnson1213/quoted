@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
+import { Auth } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { filter, switchMap } from 'rxjs';
 
 import { Quote } from 'src/app/model/quote.dto';
 import { QuoteService } from 'src/app/services/quote.service';
@@ -33,7 +32,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.quoteForm = this.fb.group({
       content: ['', [Validators.required]],
-      author: ['']
+      author: [''],
+      tags: ['']
     });
 
     this.searchForm = this.fb.group({
@@ -83,7 +83,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.selectedQuote = quote;
     this.quoteForm.patchValue({
       content: quote?.content,
-      author: quote?.author
+      author: quote?.author,
+      tags: quote?.tags?.join(', ')
     });
 
     this.showEditQuoteModal = true;
@@ -119,6 +120,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     if (this.quoteForm.value.author) {
       newQuote.author = this.quoteForm.value.author
     };
+
+    if (this.quoteForm.value.tags) {
+      newQuote.tags = this.quoteForm.value.tags.split(/,\s+/);
+    }
 
     this.quoteSvc.saveQuote(newQuote)
       .subscribe(() => {

@@ -18,13 +18,15 @@
 
 <q-modal class="new-quote" *ngIf="showEditQuoteModal" (close)="showEditQuoteModal = false">
   <h2>New quote</h2>
-  <form [formGroup]="quoteForm" (submit)="saveQuote()">
+  <form [formGroup]="quoteForm">
     <textarea #content formControlName="content" rows="8" placeholder="New quote"></textarea>
     <input type="text" formControlName="author" placeholder="Author" />
+    <input type="text" formControlName="tags" placeholder="Tags" />
+
+    <div class="actions">
+      <button type="button" class="btn" (click)="deleteQuote()">Delete</button>
+      <button type="button" class="btn" (click)="cancelEditing()">Cancel</button>
+      <button type="submit" class="btn" (click)="saveQuote()">Save</button>
+    </div>
   </form>
-  <div class="actions">
-    <button class="btn" (click)="deleteQuote()">Delete</button>
-    <button class="btn" (click)="cancelEditing()">Cancel</button>
-    <button class="btn" (click)="saveQuote()">Save</button>
-  </div>
 </q-modal>
