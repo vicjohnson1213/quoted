@@ -19,7 +19,7 @@
 <q-modal class="new-quote" *ngIf="showEditQuoteModal" (close)="showEditQuoteModal = false">
   <h2>New quote</h2>
   <form [formGroup]="quoteForm">
-    <textarea #content formControlName="content" rows="8" placeholder="New quote"></textarea>
+    <textarea #content formControlName="content" rows="8" placeholder="New quote" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <input type="text" formControlName="author" placeholder="Author" />
     <input type="text" formControlName="tags" placeholder="Tags" />
 
